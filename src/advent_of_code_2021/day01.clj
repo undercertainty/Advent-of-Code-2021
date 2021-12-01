@@ -1,4 +1,5 @@
-(ns advent-of-code-2021.day01)
+(ns advent-of-code-2021.day01
+  (:require [clojure.string :as str]))
 
 (def test-file "data/day01/test.txt")
 (def puzzle-input "data/day01/puzzle.txt")
@@ -9,7 +10,7 @@
 (defn parse-input [file-in]
   (->> file-in
        (slurp)
-       (re-seq #"\d+")
+       (str/split-lines)
        (map #(Integer/parseInt %))))
 
 (parse-input test-file)
@@ -21,14 +22,14 @@
 ; sequence as well, so let's define a function here for that:
 
 (defn count-increases [seq-in]
-   (->> (map - seq-in (rest seq-in))
-         (filter #(< % 0))
-         count))
+  (->> (map < seq-in (rest seq-in))
+       (filter true?)
+       count))
 
 (count-increases (parse-input test-file))
 
 (defn day01a [file-in]
-  (count-increases (parse-input test-file))
+  (count-increases (parse-input file-in)))
 
 (day01a test-file)
 
@@ -50,4 +51,3 @@
 
 (day01b puzzle-input)
 ; 1486
-
