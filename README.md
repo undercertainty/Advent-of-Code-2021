@@ -1,6 +1,6 @@
-# advent-of-code-2021
+# Advent of code 2021
 
-A Clojure library designed to ... well, that part is up to you.
+This year's attempt at [Advent of Code](https://adventofcode.com/2021). I'll be working with Clojure until I get overwhelmed and realise how much easier it will be in Python.
 
 ## Usage
 
