@@ -2,9 +2,9 @@
 
 This year's attempt at [Advent of Code](https://adventofcode.com/2021). I'll be working with Clojure until I get overwhelmed and realise how much easier it will be in Python.
 
-## Usage
+## Testing
 
-FIXME
+I'm not bothering with a proper test structure. For the time being, all the code is going to be in the `src` directory.
 
 ## License
 
