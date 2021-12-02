@@ -15,3 +15,5 @@ pom.xml.asc
 .lsp/*
 *.calva-repl
 Advent2021.code-workspace
+.DS_Store
+files.ipynb

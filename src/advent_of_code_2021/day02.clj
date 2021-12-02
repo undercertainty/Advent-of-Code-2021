@@ -11,7 +11,6 @@
   (->> file-in
        (slurp)
        (re-seq #"(\w+)\s+(\d+)")
-       ; (map rest)
        (map (fn [[_ dir val]] [dir (Integer/parseInt val)]))))
 
 (parse-input test-file)
@@ -31,16 +30,14 @@
   (->> file-in
        (parse-input)
        (reduce move-sub [0 0])
-       ((fn [[x y]] (* x y)))))
+       ((fn [[x y]] (* x y))))) ; return product of x and y
 
 (day02a test-file)
 
 (day02a puzzle-input)
 ; 2036120
 
-
-; In part b, we'll need to find the number of increases in a
-; sequence as well, so let's define a function here for that:
+; Part b wants a slightly different move function
 
 (defn move-sub-b [[x y aim]
                   [dir dist]]
