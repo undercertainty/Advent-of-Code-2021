@@ -19,10 +19,11 @@
 
 (defn move-sub [[x y]
                 [dir dist]]
-  (cond
-    (= dir "up") [x (- y dist)]
-    (= dir "down") [x (+ y dist)]
-    (= dir "forward") [(+ x dist) y]))
+  (case dir
+    "up" [x (- y dist)]
+    "down" [x (+ y dist)]
+    "forward" [(+ x dist) y]))
+
 
 ; And apply to the input sequence
 
@@ -30,7 +31,7 @@
   (->> file-in
        (parse-input)
        (reduce move-sub [0 0])
-       ((fn [[x y]] (* x y))))) ; return product of x and y
+       (apply *)))  ; return product of x and y
 
 (day02a test-file)
 
@@ -41,10 +42,10 @@
 
 (defn move-sub-b [[x y aim]
                   [dir dist]]
-  (cond
-    (= dir "up") [x y (- aim dist)]
-    (= dir "down") [x y (+ aim dist)]
-    (= dir "forward") [(+ x dist) (+ y (* dist aim)) aim]))
+  (case dir
+    "up" [x y (- aim dist)]
+    "down" [x y (+ aim dist)]
+    "forward" [(+ x dist) (+ y (* dist aim)) aim]))
 
 (defn day02b [file-in]
   (->> file-in
