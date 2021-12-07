@@ -9,8 +9,17 @@
 
 (defn parse-input [file-in]
   (->> file-in
-       (slurp)
+       slurp
        ; Do something here))
+
+  ))
+
+
+(-> test-file
+    slurp)
+
+
+
 
 (parse-input test-file)
 
