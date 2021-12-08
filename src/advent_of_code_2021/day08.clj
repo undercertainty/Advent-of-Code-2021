@@ -60,6 +60,8 @@
 ; Let's say correct-mapping? is true if each of the mapped
 ; inputs is one of the characters 0-9
 
+^:dynamic *number-encodings*
+
 (def *number-encodings*
   {#{\a \b \c \e \f \g} 0
    #{\c \f} 1
