@@ -38,22 +38,24 @@
     parse-input
     (get-grid-val 0 0))
 
-; And now just do a really hacky run over the
-; dimensions:
+; And now just do a run over the dimensions:
 
 (defn get-low-points [grid]
   (for [row (range (count grid))
         column (range (count (first grid)))]
-    [(get-grid-val grid row column) [(get-grid-val grid (inc row) column)
-                                     (get-grid-val grid (dec row) column)
-                                     (get-grid-val grid row (inc column))
-                                     (get-grid-val grid row (dec column))]]))
+    {:depth (get-grid-val grid row column)
+     :point [row column]
+     :neighbours [(get-grid-val grid (inc row) column)
+                  (get-grid-val grid (dec row) column)
+                  (get-grid-val grid row (inc column))
+                  (get-grid-val grid row (dec column))]}))
 
 (defn day09a [input]
   (->> input
        get-low-points
-       (filter (fn [[point neighbours]] (< point (apply min neighbours))))
-       (map first)
+       (filter (fn [{:keys [depth point neighbours]}] 
+                 (< depth (apply min neighbours))))
+       (map :depth)
        (map inc)
        (apply +)))
 
@@ -77,30 +79,29 @@
 
 (defn find-basin-1 [{:keys [grid agenda in-basin out-basin]}]
   (let [[x y] (first agenda)]
-    {:grid grid 
-     :in-basin (if (< (get-grid-val x y) 9)
+    {:grid grid
+     :in-basin (if (< (get-grid-val grid x y) 9)
                  (conj in-basin [x y])
                  in-basin)
-     :out-basin (if (>= (get-grid-val x y) 9)
-                 (conj out-basin [x y])
-                 out-basin)
-     :agenda (concat
-              (remove
-              (contains? (set/union in-basin out-basin))
-              [(inc x) y] [(dec x) y] [x (inc y)] [x (dec y)]])
-              agenda}))
-     
+     :out-basin (if (>= (get-grid-val grid x y) 9)
+                  (conj out-basin [x y])
+                  out-basin)
+     :agenda (if (< (get-grid-val grid x y) 9)
+               (concat
+                (remove
+                 #(contains? (set/union in-basin out-basin) %)
+                 [[(inc x) y] [(dec x) y] [x (inc y)] [x (dec y)]])
+                (rest agenda))
+               (rest agenda))}))
 
+(first
+ (filter
+  (comp empty? :agenda)
+  (iterate find-basin-1 {:grid (parse-input test-file)
+                         :agenda [[0 0]]
+                         :in-basin #{}
+                         :out-basin #{}})))
 
-     
-(filter
- (
-(concat [2 3 4] [4 5 6])
-     
-(set/union #{1 2 3} #{3 4 5})
-
-
-                 )})
 
 (defn find-basin [grid x y]
   (->>   (iterate find-basin-1 {:grid grid
@@ -110,8 +111,24 @@
          (filter (comp empty? :agenda))
          first))
 
+(find-basin (parse-input test-file) 0 0)
+
+(defn find-basin-size [grid x y]
+  (->>  (find-basin grid x y)
+        :in-basin
+        count))
+
+
 (defn day09b [input]
-  "Function body")
+  (->> input
+       get-low-points
+       (filter (fn [{:keys [depth point neighbours]}] 
+                 (< depth (apply min neighbours))))
+       (map :point)
+       (map #(apply find-basin-size input %))
+       sort
+       (take-last 3)
+       (apply *)))
 
 (->> test-file
      (parse-input)
@@ -120,5 +137,6 @@
 (->> puzzle-input
      (parse-input)
      day09b)
+; 847044
 
 
