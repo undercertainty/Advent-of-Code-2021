@@ -9,6 +9,8 @@
        (sort-by second)
        reverse))
 
+; Grid functions
+
 (defn transpose [grid]
   (apply map vector grid))
 
