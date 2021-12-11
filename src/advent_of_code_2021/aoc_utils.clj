@@ -10,9 +10,19 @@
        reverse))
 
 ; Grid functions
+;
+; No error checking
 
 (defn transpose [grid]
   (apply map vector grid))
+
+(defn grid-to-map [grid]
+  (zipmap
+  (for [row (range (count grid))
+        col (range (count (first grid)))]
+    [row col])
+   (flatten grid)))
+
 
 ; a range function to count in either direction, including the 
 ; end boundaries. Will only run on integers, and increments of 
