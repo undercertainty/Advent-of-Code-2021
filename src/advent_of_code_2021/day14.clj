@@ -64,10 +64,41 @@
 ;;
 ;; Main task for part b
 
+; Want to keep a count of the pairs. So let's update the
+; representation so that we keep a list of pairs, as well as
+; the first and last characters in the template
 
+(parse-input test-file)
+
+(defn parse-b [{:keys [template rules]}]
+  {:rules rules
+   :template template
+   :counts (let [chars (set (flatten (vec rules)))]
+             (into {}
+                   (for [c1 chars
+                         c2 chars]
+                     [[c1 c2] 0])))
+   :start (first template)
+   :end (last template)})
+
+(defn add-initial-pairs [init]
+  (assoc
+   init
+   :counts
+    (reduce 
+   #(update %1 %2 inc)
+   (init :counts) 
+  (map (fn [c1 c2] [c1 c2]) 
+       (init :template) 
+       (rest (init :template))))))
 
 (defn day14b [input]
     "Function body")
+
+(->> test-file
+     parse-input
+     parse-b
+     add-initial-pairs)
 
 (->> test-file
     (parse-input)
