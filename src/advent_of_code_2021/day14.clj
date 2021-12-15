@@ -30,7 +30,7 @@
 (defn apply-rules [{:keys [:template :rules]}]
   {:template (flatten-triples
               (map
-               (fn [x z] (if-let [y (get rules [x z] false)]
+               (fn [x z] (if-let [y (rules [x z])]
                            [x y z]
                            [x z]))
                template
@@ -92,20 +92,59 @@
        (init :template) 
        (rest (init :template))))))
 
+(defn apply-rules-b [count-map rules [[x z] c]]
+  (if-let [y (rules [x z])]
+    (-> count-map
+        (update [x y] #(+ % c))
+        (update [y z] #(+ % c))
+        (update [x z] #(- % c)))
+    count-map))
+
+(defn expand-b [{:keys [rules counts start end]}]
+  {:counts (reduce
+            #(apply-rules-b %1 rules %2)
+            counts
+            counts)
+   :start start
+   :end end
+   :rules rules})
+
+
+(defn final-count [item]
+  (reduce
+   (fn [m [[c1 c2] n]]
+     (-> m
+         (update c1 #(+ % n))
+         (update c2 #(+ % n))))
+   
+   (-> (zipmap (set (flatten (keys (:counts item))))
+            (repeat 0))
+       (update (:start item) inc)
+       (update (:end item) inc))
+    (item :counts)))
+
+
 (defn day14b [input]
-    "Function body")
+  (->>  (nth
+         (iterate expand-b input)
+         40)
+        final-count
+        (sort-by val)
+     ((fn [c] (- (second (last c))
+                   (second (first c)))))
+     (#(/ % 2))))
+
 
 (->> test-file
      parse-input
      parse-b
-     add-initial-pairs)
-
-(->> test-file
-    (parse-input)
-    day14b)
-
+     add-initial-pairs
+     day14b)
+     
 (->> puzzle-input
-    (parse-input)
-    day14b)
+     parse-input
+     parse-b
+     add-initial-pairs
+     day14b)
 
-
+; 4607749009683
