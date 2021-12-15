@@ -24,6 +24,15 @@
    (flatten grid)))
 
 
+(defn update-map-values
+  "Apply function f to all values in map m"
+  [m f]
+  (reduce-kv
+   (fn [m1 k v] (assoc m1 k (f v)))
+   {}
+   m))
+
+
 ; a range function to count in either direction, including the 
 ; end boundaries. Will only run on integers, and increments of 
 ; +1 or -1.
