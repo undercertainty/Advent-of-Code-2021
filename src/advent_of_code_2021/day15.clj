@@ -51,60 +51,89 @@
       state-in)))
 
 
+(defn next-state [state-in]
+  (let [[row col] (first (sort-by (state-in :cost)
+                                  (state-in :unvisited)))]
 
-(-> test-file
-    parse-input
-    initial-state
-    (update-cost [0 0] [0 1])
-    (update-cost [0 0] [1 0])
-    (update-cost [0 1] [1 1])
-    (update-cost [1 0] [1 1])
-    :prev
-    (get [1 1]))
-
-(update-cost
- (initial-state (parse-input test-file))
- [0 0]
- [0 1]
- )
-
-
-(defn next-state [{:keys [unvisited cave cost prev]}]
-  (let [[row col] (first (sort-by cost unvisited))]
-    (update-costs)
-    
-    (filter (into #{} unvisited) (for [neighbour [[(inc row) col] [(dec row) col]
-                 [row (inc col)] [row (dec col)]]]
-      neighbour))))
-    
+    (assoc
+     (reduce
+      (fn [m d] (update-cost m [row col] d))
+      state-in
+      (filter (into #{} (state-in :unvisited))
+              (for [neighbour [[(inc row) col] [(dec row) col]
+                               [row (inc col)] [row (dec col)]]]
+                neighbour)))
+     :unvisited
+     (rest (sort-by (state-in :cost)
+                    (state-in :unvisited))))))
 
 ;;; Main task for part a
 
 (defn day15a [input]
-    (initial-state input))
+  (let [init (initial-state input)]
+    (-> (first
+         (filter
+          (comp empty? :unvisited)
+          (iterate
+           next-state
+           init)))
+        :cost
+        (get (last (sort (init :unvisited))))
+        (- ((init :cost) [0 0])))))
 
-(->> test-file
-    (parse-input)
-    day15a
-     next-state)
-
-(->> puzzle-input
-    (parse-input)
+(-> test-file
+    parse-input
     day15a)
+
+(-> puzzle-input
+    parse-input
+    day15a)
+
+; 589
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;; Main task for part b
 
+; We're not going to improve on the search algorithm, but do
+; need to go through the scruffy task of creating the new 500x500 grid.
+
+(defn incloop [x]
+  (if (= x 9)
+    1
+    (inc x)))
+
+(defn extend-row [row]
+  (concat row 
+          (map incloop row)
+          (map (comp incloop incloop) row)
+          (map (comp incloop incloop incloop) row)
+          (map (comp incloop incloop incloop incloop) row)))
+
+(defn parse-input-b [f]
+  (->> f
+       slurp
+       str/split-lines
+       (map
+        (fn [r] (map (comp #(- % 48) int) r)))))
+
+
 (defn day15b [input]
-    "Function body")
+  (->> input
+       (map extend-row)
+       aoc/transpose
+       (map extend-row)
+       aoc/transpose
+       aoc/grid-to-map
+       day15a))
 
 (->> test-file
-    (parse-input)
-    day15b)
+     parse-input-b
+     day15b)
 
 (->> puzzle-input
-    (parse-input)
-    day15b)
+     parse-input-b
+     day15b)
+; 2885
 
 
